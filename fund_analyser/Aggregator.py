@@ -4,6 +4,7 @@ import pandas as pd
 import numpy as np
 from fund_analyser.Indicators import BaseIndicator
 from fund_analyser.utils import logger
+import json
 
 # Get the timezone from environment, default to UTC
 TIMEZONE = os.environ.get("TIMEZONE", "UTC")
@@ -86,4 +87,18 @@ class FinancialIndicatorsAggregator:
                         logger.warning(f"Error for {indicator.name} on {period_name}: {e}")
                         res[indicator.name] = None
             results[period_name] = res
+        self.results = results
         return results
+    
+
+    def save_results_json(self, filepath):
+        results = self.results  
+        for period in results:
+            for key in results[period]:
+                value = results[period][key]
+                if isinstance(value, (np.floating, np.integer)):
+                    results[period][key] = float(value)
+                if pd.isna(value):
+                    results[period][key] = None
+        with open(filepath, "w") as f:
+            json.dump(results, f, indent=2)
