@@ -69,7 +69,7 @@ def fetch_yahoo_history(ticker, start="2023-01-01", end=None, tz=TIMEZONE):
         df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize("UTC").dt.tz_convert(tzinfo)
     return df[["Date", "Close"]]
 
-def fetch data(isin, start="2023-01-01", end=None):
+def fetch_data(isin, start="2023-01-01", end=None):
     """ISIN -> ticker -> Yahoo Finance history."""
     tickers = isin_to_tickers(isin)
     if not tickers:
