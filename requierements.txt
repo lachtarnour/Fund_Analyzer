@@ -1,4 +1,4 @@
-pandas 
+pandas
 requests
 logging
 yfinance
