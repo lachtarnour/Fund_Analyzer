@@ -38,7 +38,6 @@ export TIMEZONE="Europe/Paris"
 export OPENFIGI_API_KEY="your_api_key"
 ```
 
----
 
 ## Usage
 
@@ -66,6 +65,45 @@ Edit `main.py` to:
 
 ---
 
+
+### Indicator Formulas
+
+- **Performance:**  
+  `Performance = (Last Close / First Close) - 1`  
+  Measures the percentage change in value over the period.
+
+- **Volatility (Annualized):**  
+  `Volatility = std(daily log returns) * sqrt(252)`  
+  Where `daily log return = log(Close_t / Close_{t-1})`,  
+  and 252 is the number of trading days in a year.
+
+- **Annualized Return:**  
+  `Annualized Return = (1 + Performance)^(252 / N) - 1`  
+  Where `N` is the number of trading days in the period.
+
+- **Max Drawdown:**  
+  `Max Drawdown = min( (Close_t - peak_t) / peak_t )`  
+  Where `peak_t` is the running maximum of the closing price up to time t.
+
+---
+
+### Limitations
+
+- **Data Quality:**  
+  - All data are from Yahoo Finance. Occasional gaps, short histories, or errors may exist.
+  - If a period contains less than two valid price points, the result is `null`.
+- **Frequency & Period:**  
+  - Only daily data are supported.
+  - Periods may be short for new or illiquid funds.
+- **Timezone:**  
+  - All internal calculations use UTC; results can be converted for display.
+- **Mapping:**  
+  - The mapping from ISIN to ticker is automated but may fail for rare funds or incorrect ISINs.
+- **General:**  
+  - Results may be unreliable for illiquid, highly volatile, or newly listed assets.
+
+---
+
 ## Example Output
 
 ```json
@@ -83,7 +121,6 @@ Edit `main.py` to:
 }
 ```
 
----
 
 ## Adding a New Indicator
 
