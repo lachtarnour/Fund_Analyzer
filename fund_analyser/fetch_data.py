@@ -10,7 +10,7 @@ from fund_analyser.utils import logger
 # --- Env setup ---
 load_dotenv()
 OPENFIGI_API_KEY = os.environ.get("OPENFIGI_API_KEY", "775b5750-1e5f-42f8-88b6-000ccbb6a577")
-TIMEZONE = os.environ.get("TIMEZONE", "Europe/Paris")
+TIMEZONE = os.environ.get("TIMEZONE", "UTC")
 
 def isin_to_tickers(isin: str) -> list:
     """Query OpenFIGI to get possible tickers for an ISIN."""
@@ -60,13 +60,16 @@ def fetch_yahoo_history(ticker, start="2023-01-01", end=None, tz=TIMEZONE):
     if end is None:
         end = datetime.now(tzinfo).strftime("%Y-%m-%d")
     logger.info(f"Downloading {ticker} from {start} to {end} (end excluded), timezone: {tz}")
-    df = yf.download(ticker, start=start, end=end, progress=False)
+    df = yf.download(ticker, start=start, end=end, progress=False, auto_adjust=True)
     if df.empty:
         logger.warning(f"No Yahoo data for {ticker}.")
         return None
     df.reset_index(inplace=True)
     if "Date" in df.columns:
-        df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize("UTC").dt.tz_convert(tzinfo)
+        if df["Date"].dt.tz is None:
+            df["Date"] = pd.to_datetime(df["Date"]).dt.tz_localize("UTC").dt.tz_convert(tzinfo)
+        else:
+            df["Date"] = df["Date"].dt.tz_convert(tzinfo)
     return df[["Date", "Close"]]
 
 def fetch_data(isin, start="2023-01-01", end=None):
